@@ -1,9 +1,18 @@
 import express from "express";
 import axios from "axios";
 import Stripe from "stripe";
+import cors from "cors";
 
 const app = express();
 app.use(express.json());
+
+// -----------------------------------------
+// 🛠️ CORS FIX — OBLIGATOIRE POUR STRIPE
+// -----------------------------------------
+app.use(cors({
+  origin: "https://noyer.io",   // ton site front
+  methods: ["GET", "POST"],
+}));
 
 // -----------------------------------------
 // 🔐 FACEBOOK CONFIG
@@ -33,7 +42,7 @@ app.get("/auth/facebook/callback", async (req, res) => {
     const code = req.query.code;
     if (!code) return res.status(400).send("Code OAuth manquant");
 
-    const tokenResponse = await axios.get(
+    await axios.get(
       "https://graph.facebook.com/v19.0/oauth/access_token",
       {
         params: {
